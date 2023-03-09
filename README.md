@@ -1,26 +1,36 @@
 # Boat Port Simulation 
-Welcome to the Boat Port Simulation project! This project simulates the operation of a boat port, including the arrival and departure of boats, management of berths, and billing of boat owners.
+Welcome to the Boat Port Simulation project! 
 
-## Getting Started
-To get started with the Boat Port Simulation project, follow these steps:
+## Explanation 
+The Operating Systems and Parallel Computing project aimed to simulate a real-life situation and provide insights into the performance of the simulation. 
+To achieve this goal, several techniques and assumptions were employed.
 
-Clone the repository to your local machine using git clone https://github.com/yourusername/boat-port-simulation.git.
-Install the required dependencies using pip install -r requirements.txt.
-Run the simulation using python main.py.
+Firstly, a mediator design pattern was utilized to simulate a real-life case. 
+This design pattern ensured that the control station had permission to manage the other instances in the simulation. 
+Additionally, the simulation consisted of different independent agents that worked in parallel. 
+These agents included boats, the control station, and workers. 
+Furthermore, transporters and cranes were controlled by the workers, making them dependent on the workers.
+To track the movements of each agent in the simulation, the control station recorded their activities in a database.
+This database was used to generate reports at the end of the simulation.
 
-## Usage
-The Boat Port Simulation project provides a command-line interface for interacting with the simulation. To view the available commands, run python main.py --help. Here are some common commands:
+The simulation's performance was analyzed by creating a Streamlit webpage that provided instant insights and personalized the simulation for various cases*.
 
-
-## Contributing
-We welcome contributions to the Boat Port Simulation project! To contribute, follow these steps:
-
-1. Fork the repository on GitHub.
-2. Create a new branch for your changes using git checkout -b my-new-feature.
-3. Make your changes and commit them with descriptive commit messages.
-4. Push your changes to your fork with git push origin my-new-feature.
-5. Submit a pull request on GitHub.
-6. Please ensure that your code adheres to the project's code style and passes all tests before submitting a pull request.
-
-## License
-The Boat Port Simulation project is licensed under the MIT License. See the LICENSE file for more information.
+## How to run the simulation 
+To run the simulation the following steps have to be followed: 
+1. Clone the repository.
+2. Install the requirements using the command `pip install`.
+    Here is a lis of all the libraries to install:
+   - Streamlit 
+   - Matplotlib 
+   - Colorama 
+   - Mysql-connector-python
+   - Faker 
+   - plotly.express 
+   - Time 
+   - Concurrent.futures 
+   - Datetime 
+   - Copy
+3. Run the file streamlit_app.py using the command `streamlit run streamlit_app.py`.
+4. The simulation will start and the webpage will open in your browser.
+5. Then, follow the guidelines on the streamlit. 
+6. The simulation will run and the results will be displayed on the webpage.
