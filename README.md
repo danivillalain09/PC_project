@@ -19,7 +19,7 @@ The simulation's performance was analyzed by creating a Streamlit webpage that p
 To run the simulation the following steps have to be followed: 
 1. Clone the repository.
 2. Install the requirements using the command `pip install`.
-    Here is a lis of all the libraries to install:
+    Here is a list of all the libraries to install:
    - Streamlit 
    - Matplotlib 
    - Colorama 
