@@ -63,10 +63,6 @@ def presentation_page():
 
 def loading_page():
     st.header("This is the loading page.")
-    st.write("The password and the database are:")
-    st.write(st.session_state["password"])
-    st.write(st.session_state["database"])
-    st.write("")
     st.write("The input parameters are:")
     st.write("Number of boats:", st.session_state["num_boats"])
     st.write("Number of ports:", st.session_state["num_ports"])
@@ -95,7 +91,7 @@ def insights_page():
 
 
 # Run the app
-if __name__ == "__main__":
+def main():
     # Initialize the session state variables.
     st.session_state.setdefault("page_view", 1)
     st.session_state.setdefault("password", False)
@@ -114,3 +110,5 @@ if __name__ == "__main__":
         loading_page()
     elif st.session_state["page_view"] == 4:
         insights_page()
+
+main()
