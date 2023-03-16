@@ -1,8 +1,9 @@
 import mysql.connector
 import threading
 import time
-import pandas as pd
 import copy
+import traceback
+import pandas as pd
 
 
 class Connection:
@@ -17,6 +18,8 @@ class Connection:
         self.cursor = self.cnx.cursor()
         self.create_new_tables()
         self.sql_locker = threading.Lock()
+
+        print(self.reset_database)
 
     def create_new_tables(self):
         if self.reset_database:
@@ -43,64 +46,77 @@ class Connection:
                 self.cursor.execute("CREATE TABLE Employees_Race (Employee VARCHAR(255), Machine VARCHAR(255), Picture VARCHAR(255))")
 
     def add_columns(self, boat, container, employee, machine):
-        if self.reset_database:
-            boat_attributes = vars(boat)
-            for keys in boat_attributes:
-                format = type(boat_attributes[keys])
-                format = str(format)
-                if keys == "sql" or keys == "mediator" or keys == "active" or keys == "priority" or keys == "name" \
-                        or keys == "start" or keys == "price" or keys == "disable_delay" or keys == "disable_priority":
-                    continue
-                if format == "<class 'str'>" or keys == "dock":
-                    query = "ALTER TABLE Boats ADD {} VARCHAR (255)".format(keys.capitalize())
-                elif format == "<class 'datetime.datetime'>" or format == "<class 'datetime.date'>":
-                    query = "ALTER TABLE Boats ADD {} datetime".format(keys.capitalize())
-                else:
-                    query = "ALTER TABLE Boats ADD {} INT ".format(keys.capitalize())
-                self.cursor.execute(query)
+        try:
+            if self.reset_database:
+                boat_attributes = vars(boat)
+                for keys in boat_attributes:
+                    format = type(boat_attributes[keys])
+                    format = str(format)
+                    if keys == "sql" or keys == "mediator" or keys == "active" or keys == "priority" or keys == "name" \
+                            or keys == "start" or keys == "price" or keys == "disable_delay" or keys == "disable_priority":
+                        continue
+                    if format == "<class 'str'>" or keys == "dock":
+                        query = "ALTER TABLE Boats ADD {} VARCHAR (255)".format(keys.capitalize())
+                    elif format == "<class 'datetime.datetime'>" or format == "<class 'datetime.date'>":
+                        query = "ALTER TABLE Boats ADD {} datetime".format(keys.capitalize())
+                    else:
+                        query = "ALTER TABLE Boats ADD {} INT ".format(keys.capitalize())
+                    self.cursor.execute(query)
 
-            column_list = ["Time_in_queue", "Time_waiting_confirmation", "Time_in_dock", "Time_leaving",
-                           "Amount_Charged"]
-            for column in column_list:
-                query = "ALTER TABLE Boats_arrivals ADD {} INT".format(column.capitalize())
-                self.cursor.execute(query)
+                print("Added the columns to the table Boats")
 
-            machine = vars(machine)
-            for keys in machine:
-                format = type(machine[keys])
-                format = str(format)
-                if keys == "locker" or keys == "active" or keys == "name":
-                    continue
-                if format == "<class 'str'>":
-                    query = "ALTER TABLE Machines ADD {} VARCHAR (255)".format(keys.capitalize())
-                else:
-                    query = "ALTER TABLE Machines ADD {} INT ".format(keys.capitalize())
-                self.cursor.execute(query)
+                column_list = ["Time_in_queue", "Time_waiting_confirmation", "Time_in_dock", "Time_leaving",
+                               "Amount_Charged"]
+                for column in column_list:
+                    query = "ALTER TABLE Boats_arrivals ADD {} INT".format(column.capitalize())
+                    self.cursor.execute(query)
 
-            employee = vars(employee)
-            for keys in employee:
-                format = type(employee[keys])
-                format = str(format)
-                if keys == "mediator" or keys == "boat" or keys == "active" or keys == "dock" \
-                        or keys == "finished" or keys == "name" or keys == "number_containers":
-                    continue
-                if format == "<class 'str'>" or keys == "dock" or format == "<class '__main__.Crane'>" or keys == "machine":
-                    query = "ALTER TABLE Employees ADD {} VARCHAR (255)".format(keys.capitalize())
-                else:
-                    query = "ALTER TABLE Employees ADD {} INT ".format(keys.capitalize())
-                self.cursor.execute(query)
+                print("Added the columns to the table Boats_arrivals")
+                machine = vars(machine)
+                for keys in machine:
+                    format = type(machine[keys])
+                    format = str(format)
+                    if keys == "locker" or keys == "active" or keys == "name":
+                        continue
+                    if format == "<class 'str'>":
+                        query = "ALTER TABLE Machines ADD {} VARCHAR (255)".format(keys.capitalize())
+                    else:
+                        query = "ALTER TABLE Machines ADD {} INT ".format(keys.capitalize())
+                    self.cursor.execute(query)
 
-            container = vars(container)
-            for keys in container:
-                format = type(container[keys])
-                format = str(format)
-                if keys == "number":
-                    continue
-                if format == "<class 'str'>":
-                    query = "ALTER TABLE Storage_Area ADD {} VARCHAR (255)".format(keys.capitalize())
-                else:
-                    query = "ALTER TABLE Storage_Area ADD {} INT ".format(keys.capitalize())
-                self.cursor.execute(query)
+                print("Added the columns to the table Machines")
+
+                employee = vars(employee)
+                for keys in employee:
+                    format = type(employee[keys])
+                    format = str(format)
+                    if keys == "mediator" or keys == "boat" or keys == "active" or keys == "dock" \
+                            or keys == "finished" or keys == "name" or keys == "number_containers":
+                        continue
+                    if format == "<class 'str'>" or keys == "dock" or format == "<class '__main__.Crane'>" or keys == "machine":
+                        query = "ALTER TABLE Employees ADD {} VARCHAR (255)".format(keys.capitalize())
+                    else:
+                        query = "ALTER TABLE Employees ADD {} INT ".format(keys.capitalize())
+                    self.cursor.execute(query)
+
+                print("Added the columns to the table Employees")
+
+                container = vars(container)
+                for keys in container:
+                    format = type(container[keys])
+                    format = str(format)
+                    if keys == "number":
+                        continue
+                    if format == "<class 'str'>":
+                        query = "ALTER TABLE Storage_Area ADD {} VARCHAR (255)".format(keys.capitalize())
+                    else:
+                        query = "ALTER TABLE Storage_Area ADD {} INT ".format(keys.capitalize())
+                    self.cursor.execute(query)
+
+                print("Added the columns to the table Storage_Area")
+
+        except Exception:
+            traceback.print_exc()
 
     def get_starting_number(self):
         self.cursor.execute("SELECT Boat FROM Boats")
@@ -119,38 +135,44 @@ class Connection:
         return maximum
 
     def insert_values_initial(self, boat):
-        copy_boat = copy.copy(boat)
-        attributes = vars(copy_boat)
-        attributes.pop("sql")
-        attributes.pop("mediator")
-        attributes.pop("active")
-        attributes.pop("priority")
-        attributes.pop("start")
-        attributes.pop("price")
-        attributes.pop("disable_delay")
-        attributes.pop("disable_priority")
+        try:
+            copy_boat = copy.copy(boat)
+            attributes = vars(copy_boat)
+            attributes.pop("sql")
+            attributes.pop("mediator")
+            attributes.pop("active")
+            attributes.pop("priority")
+            attributes.pop("start")
+            attributes.pop("price")
+            attributes.pop("disable_delay")
+            attributes.pop("disable_priority")
 
-        query = "INSERT INTO Boats VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s)"
-        values = tuple(attributes.values())
-        self.cursor.execute(query, values)
+            query = "INSERT INTO Boats VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s)"
+            values = tuple(attributes.values())
+            self.cursor.execute(query, values)
 
-        self.cnx.commit()
+            self.cnx.commit()
+        except Exception:
+            traceback.print_exc()
 
     def insert_values_employees(self, employee):
-        copy_employee = copy.copy(employee)
-        attributes = vars(copy_employee)
-        attributes.pop("finished")
-        attributes.pop("mediator")
-        attributes.pop("active")
-        attributes.pop("boat")
-        attributes.pop("dock")
-        attributes.pop("number_containers")
-        attributes["machine"] = employee.machine.name
-        query = "INSERT INTO Employees VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = tuple(attributes.values())
-        self.cursor.execute(query, values)
+        try:
+            copy_employee = copy.copy(employee)
+            attributes = vars(copy_employee)
+            attributes.pop("finished")
+            attributes.pop("mediator")
+            attributes.pop("active")
+            attributes.pop("boat")
+            attributes.pop("dock")
+            attributes.pop("number_containers")
+            attributes["machine"] = employee.machine.name
+            query = "INSERT INTO Employees VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            values = tuple(attributes.values())
+            self.cursor.execute(query, values)
 
-        self.cnx.commit()
+            self.cnx.commit()
+        except Exception:
+            traceback.print_exc()
 
     def insert_boats_arrivals(self, starting_time, boat):
         query = f"INSERT INTO Boats_arrivals (Boat, Arrival_time) VALUES ('{boat.name}',{time.time() - starting_time});"
@@ -178,24 +200,35 @@ class Connection:
         self.cnx.commit()
 
     def insert_machines(self, machine):
-        copy_machine = copy.copy(machine)
-        attributes = vars(copy_machine)
-        attributes.pop("locker")
-        attributes.pop("active")
-        query = "INSERT INTO Machines VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = tuple(attributes.values())
-        self.cursor.execute(query, values)
+        try:
+            copy_machine = copy.copy(machine)
+            attributes = vars(copy_machine)
+            attributes.pop("locker")
+            attributes.pop("active")
+            query = "INSERT INTO Machines VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            values = tuple(attributes.values())
+            self.cursor.execute(query, values)
 
-        self.cnx.commit()
+            self.cnx.commit()
+        except Exception:
+            traceback.print_exc()
 
     def insert_containers(self, container):
-        container = copy.copy(container)
-        attributes = vars(container)
-        query = "INSERT INTO Storage_Area VALUES (%s, %s, %s, %s, %s)"
-        values = tuple(attributes.values())
-        self.cursor.execute(query, values)
+        try:
+            container = copy.copy(container)
+            attributes = vars(container)
+            query = "INSERT INTO Storage_Area VALUES (%s, %s, %s, %s, %s)"
+            values = tuple(attributes.values())
+            self.cursor.execute(query, values)
 
-        self.cnx.commit()
+            self.cnx.commit()
+        except Exception:
+            traceback.print_exc()
 
+    def print_insight1(self):
+        self.cursor.execute("SELECT * FROM Boats_arrivals")
+        result = self.cursor.fetchall()
+        result = pd.DataFrame(result)
 
+        return result
 
