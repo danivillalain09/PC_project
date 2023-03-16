@@ -30,7 +30,8 @@ To run the simulation the following steps have to be followed:
    - Concurrent.futures 
    - Datetime 
    - Copy
-3. Run the file streamlit_app.py using the command `streamlit run streamlit_app.py`.
+3. Run the file streamlit_app.py using the command in the terminal `streamlit run streamlit_app.py`.
 4. The simulation will start and the webpage will open in your browser.
 5. Then, follow the guidelines on the streamlit. 
 6. The simulation will run and the results will be displayed on the webpage.
+7. To stop streamlit running in the terminal it is important to press `Ctrl + C`.
