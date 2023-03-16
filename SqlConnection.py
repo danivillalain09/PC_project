@@ -19,8 +19,6 @@ class Connection:
         self.create_new_tables()
         self.sql_locker = threading.Lock()
 
-        print(self.reset_database)
-
     def create_new_tables(self):
         if self.reset_database:
             try:
@@ -225,10 +223,15 @@ class Connection:
         except Exception:
             traceback.print_exc()
 
-    def print_insight1(self):
-        self.cursor.execute("SELECT * FROM Boats_arrivals")
+    def get_dataset(self, table):
+        self.cursor.execute(f"DESCRIBE {table};")
+        values = self.cursor.fetchall()
+        column_names = [i[0] for i in values]
+        # Get the values from the table
+        query = f"SELECT * FROM {table}"
+        self.cursor.execute(query)
         result = self.cursor.fetchall()
-        result = pd.DataFrame(result)
+        result = pd.DataFrame(result, columns=column_names)
 
         return result
 
